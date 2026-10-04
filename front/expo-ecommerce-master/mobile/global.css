@@ -7,4 +7,9 @@ body,
 #root {
   background-color: #f8f8f5;
   direction: rtl;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
 }

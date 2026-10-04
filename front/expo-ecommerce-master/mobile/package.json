@@ -9,6 +9,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "build:web": "expo export -p web",
     "lint": "expo lint",
     "gen:gsap": "node ./scripts/generate-gsap-inline.js",
     "gen:brand": "node ./scripts/generate-brand-assets.js"
@@ -58,5 +59,8 @@
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
 }

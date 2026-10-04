@@ -25,7 +25,14 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png",
+      "name": "مول البايض — تسوق إلكتروني",
+      "shortName": "مول البايض",
+      "description": "تصفّح جميع أصناف مول البايض من الهاتف أو الكمبيوتر.",
+      "lang": "ar",
+      "themeColor": "#0B2B24",
+      "backgroundColor": "#F8F8F5"
     },
     "plugins": [
       "expo-router",

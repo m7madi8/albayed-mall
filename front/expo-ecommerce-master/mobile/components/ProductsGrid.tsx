@@ -2,8 +2,9 @@ import { palette } from "@/theme/palette";
 import ProductCard from "@/components/ProductCard";
 import { Product } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useProductGridMetrics } from "@/lib/responsive";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Animated, { Easing, withDelay, withTiming } from "react-native-reanimated";
 
 const ENTER_RISE = 28;
@@ -38,19 +39,12 @@ interface ProductsGridProps {
 }
 
 const ProductsGrid = ({ products, isLoading, isError, onRetry, animationKey }: ProductsGridProps) => {
+  const { cardWidth, gap, columns } = useProductGridMetrics();
   const [initialKey] = useState(animationKey);
   const [hasNavigated, setHasNavigated] = useState(false);
   const keyChanged = animationKey !== initialKey;
   if (keyChanged && !hasNavigated) setHasNavigated(true);
   const animate = hasNavigated || keyChanged;
-
-  const rows = useMemo(() => {
-    const result: Product[][] = [];
-    for (let i = 0; i < products.length; i += 2) {
-      result.push(products.slice(i, i + 2));
-    }
-    return result;
-  }, [products]);
 
   if (isLoading) {
     return (
@@ -83,18 +77,14 @@ const ProductsGrid = ({ products, isLoading, isError, onRetry, animationKey }: P
   }
 
   return (
-    <View key={animationKey}>
-      {rows.map((row, rowIndex) => (
-        <View key={row.map((p) => p._id).join("-")} className="flex-row justify-between">
-          {row.map((product, colIndex) => (
-            <Animated.View
-              key={product._id}
-              entering={animate ? itemEntering(rowIndex * 2 + colIndex) : undefined}
-            >
-              <ProductCard product={product} />
-            </Animated.View>
-          ))}
-        </View>
+    <View key={animationKey} style={{ flexDirection: "row", flexWrap: "wrap", gap }}>
+      {products.map((product, index) => (
+        <Animated.View
+          key={product._id}
+          entering={animate ? itemEntering(index % columns) : undefined}
+        >
+          <ProductCard product={product} cardWidth={cardWidth} />
+        </Animated.View>
       ))}
     </View>
   );

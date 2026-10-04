@@ -7,7 +7,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { memo } from "react";
-import { ActivityIndicator, Alert, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { cardWidthForGrid, gridColumnsForWidth, GRID_GAP, GRID_HORIZONTAL_PADDING, useContentWidth } from "@/lib/responsive";
+import { ActivityIndicator, Alert, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -17,16 +18,14 @@ import Animated, {
 
 const CARD_IMAGE_HEIGHT = 168;
 const CARD_CONTENT_HEIGHT = 130;
-const GRID_HORIZONTAL_PADDING = 40;
-const GRID_GAP = 12;
-
 interface ProductCardProps {
   product: Product;
   layout?: "grid" | "rail";
+  cardWidth?: number;
 }
 
-function ProductCard({ product }: ProductCardProps) {
-  const { width: screenWidth } = useWindowDimensions();
+function ProductCard({ product, cardWidth: cardWidthProp }: ProductCardProps) {
+  const contentWidth = useContentWidth();
   const { addToCart, isAddingToCart } = useCart();
   const { showToast } = useToast();
   const offer = getOffer(product);
@@ -35,7 +34,9 @@ function ProductCard({ product }: ProductCardProps) {
   const scale = useSharedValue(1);
   const lift = useSharedValue(0);
 
-  const cardWidth = Math.floor((screenWidth - GRID_HORIZONTAL_PADDING - GRID_GAP) / 2);
+  const cardWidth =
+    cardWidthProp ??
+    cardWidthForGrid(contentWidth, gridColumnsForWidth(contentWidth));
 
   const cardAnimatedStyle = useAnimatedStyle(() => ({
     transform: [

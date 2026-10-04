@@ -5,12 +5,13 @@ import ProductsGrid from "@/components/ProductsGrid";
 import SafeScreen from "@/components/SafeScreen";
 import { MALL_DEPARTMENTS } from "@/data/mall-departments";
 import { getCatalogProductCountsByDepartment } from "@/data/store-catalog";
-import useCart from "@/hooks/useCart";
+import { useIsWideWeb } from "@/lib/responsive";
 import useProducts from "@/hooks/useProducts";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useMemo, useState, type ComponentProps } from "react";
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from "react-native";
+import { Platform, View, Text, ScrollView, TouchableOpacity, TextInput } from "react-native";
+import useCart from "@/hooks/useCart";
 
 const ALL_CATEGORY = "الكل";
 
@@ -46,6 +47,8 @@ const ShopScreen = () => {
   }, [products, selectedCategory, searchQuery]);
 
   const totalInCatalog = products?.length ?? 0;
+  const isWeb = Platform.OS === "web";
+  const isWideWeb = useIsWideWeb();
 
   return (
     <SafeScreen>
@@ -57,31 +60,37 @@ const ShopScreen = () => {
         keyboardShouldPersistTaps="handled"
         directionalLockEnabled
       >
-        <View className="px-5 pt-4 pb-2">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <BrandMark size={72} />
-              <View className="ms-3">
-                <Text className="text-text-primary text-2xl font-bold">مول البايض</Text>
-                <Text className="text-text-secondary text-sm mt-0.5">كتالوج المول كامل</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              className="w-11 h-11 rounded-full bg-surface border border-line items-center justify-center"
-              onPress={() => router.push("/(tabs)/cart")}
-              accessibilityRole="button"
-              accessibilityLabel="السلة"
-            >
-              <Ionicons name="cart-outline" size={22} color={palette.ink} />
-              {cartItemCount > 0 && (
-                <View className="absolute -top-1 -left-1 bg-primary min-w-5 h-5 px-1 rounded-full items-center justify-center">
-                  <Text className="text-ivory text-[10px] font-bold">{cartItemCount}</Text>
+        <View className={`px-5 pb-2 ${isWeb ? "pt-6" : "pt-4"}`}>
+          {!isWeb && (
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center">
+                <BrandMark size={72} />
+                <View className="ms-3">
+                  <Text className="text-text-primary text-2xl font-bold">مول البايض</Text>
+                  <Text className="text-text-secondary text-sm mt-0.5">كتالوج المول كامل</Text>
                 </View>
-              )}
-            </TouchableOpacity>
-          </View>
+              </View>
+              <TouchableOpacity
+                className="w-11 h-11 rounded-full bg-surface border border-line items-center justify-center"
+                onPress={() => router.push("/(tabs)/cart")}
+                accessibilityRole="button"
+                accessibilityLabel="السلة"
+              >
+                <Ionicons name="cart-outline" size={22} color={palette.ink} />
+                {cartItemCount > 0 && (
+                  <View className="absolute -top-1 -left-1 bg-primary min-w-5 h-5 px-1 rounded-full items-center justify-center">
+                    <Text className="text-ivory text-[10px] font-bold">{cartItemCount}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          )}
 
-          <View className="bg-surface border border-line flex-row items-center px-4 mt-5 rounded-2xl h-14">
+          {isWeb && (
+            <Text className="text-text-primary text-2xl font-bold mb-4">جميع أصناف المول</Text>
+          )}
+
+          <View className={`bg-surface border border-line flex-row items-center px-4 rounded-2xl h-14 ${isWeb ? "" : "mt-5"}`}>
             <Ionicons color={palette.slate} size={20} name="search" />
             <TextInput
               placeholder="ابحث في كل أصناف المول"
@@ -99,7 +108,9 @@ const ShopScreen = () => {
             <View className="self-start bg-lime rounded-full px-3 py-1">
               <Text className="text-ink text-xs font-bold">متجر شامل</Text>
             </View>
-            <Text className="text-ivory text-3xl font-bold mt-4">جميع أصناف المول</Text>
+            <Text className={`text-ivory font-bold mt-4 ${isWideWeb ? "text-4xl" : "text-3xl"}`}>
+              جميع أصناف المول
+            </Text>
             <Text className="text-ivory text-base leading-7 mt-3" style={{ opacity: 0.82 }}>
               تصفّح كل الأقسام — غذائية، لحوم، خضار، مشروبات، منظفات والمزيد. أضف ما تريد إلى السلة
               وأتمم الطلب.
@@ -115,30 +126,54 @@ const ShopScreen = () => {
         <View className="mt-7">
           <Text className="text-text-primary text-lg font-bold px-5 mb-1">أقسام المول</Text>
           <Text className="text-text-secondary text-sm px-5 mb-3">اختر قسماً لعرض أصنافه</Text>
-          <ScrollView
-            horizontal
-            nestedScrollEnabled
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
-          >
-            <DepartmentChip
-              name={ALL_CATEGORY}
-              icon="view-grid-outline"
-              count={totalInCatalog}
-              isSelected={selectedCategory === ALL_CATEGORY}
-              onPress={() => setSelectedCategory(ALL_CATEGORY)}
-            />
-            {MALL_DEPARTMENTS.map((department) => (
+          {isWideWeb ? (
+            <View className="flex-row flex-wrap px-5 gap-3">
               <DepartmentChip
-                key={department.name}
-                name={department.name}
-                icon={department.icon}
-                count={departmentCounts[department.name] ?? 0}
-                isSelected={selectedCategory === department.name}
-                onPress={() => setSelectedCategory(department.name)}
+                name={ALL_CATEGORY}
+                icon="view-grid-outline"
+                count={totalInCatalog}
+                isSelected={selectedCategory === ALL_CATEGORY}
+                onPress={() => setSelectedCategory(ALL_CATEGORY)}
+                layout="grid"
               />
-            ))}
-          </ScrollView>
+              {MALL_DEPARTMENTS.map((department) => (
+                <DepartmentChip
+                  key={department.name}
+                  name={department.name}
+                  icon={department.icon}
+                  count={departmentCounts[department.name] ?? 0}
+                  isSelected={selectedCategory === department.name}
+                  onPress={() => setSelectedCategory(department.name)}
+                  layout="grid"
+                />
+              ))}
+            </View>
+          ) : (
+            <ScrollView
+              horizontal
+              nestedScrollEnabled
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 20 }}
+            >
+              <DepartmentChip
+                name={ALL_CATEGORY}
+                icon="view-grid-outline"
+                count={totalInCatalog}
+                isSelected={selectedCategory === ALL_CATEGORY}
+                onPress={() => setSelectedCategory(ALL_CATEGORY)}
+              />
+              {MALL_DEPARTMENTS.map((department) => (
+                <DepartmentChip
+                  key={department.name}
+                  name={department.name}
+                  icon={department.icon}
+                  count={departmentCounts[department.name] ?? 0}
+                  isSelected={selectedCategory === department.name}
+                  onPress={() => setSelectedCategory(department.name)}
+                />
+              ))}
+            </ScrollView>
+          )}
         </View>
 
         <View className="px-5 mt-8">
@@ -175,19 +210,24 @@ function DepartmentChip({
   count,
   isSelected,
   onPress,
+  layout = "rail",
 }: {
   name: string;
   icon: ComponentProps<typeof MaterialCommunityIcons>["name"];
   count: number;
   isSelected: boolean;
   onPress: () => void;
+  layout?: "rail" | "grid";
 }) {
+  const isGrid = layout === "grid";
+
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`me-3 rounded-2xl w-28 h-28 px-2 overflow-hidden items-center justify-center border ${
-        isSelected ? "bg-primary border-primary" : "bg-surface border-line"
-      }`}
+      className={`rounded-2xl px-2 overflow-hidden items-center justify-center border h-28 ${
+        isGrid ? "" : "me-3 w-28"
+      } ${isSelected ? "bg-primary border-primary" : "bg-surface border-line"}`}
+      style={isGrid ? { width: "23%", minWidth: 120, maxWidth: 168 } : undefined}
       accessibilityRole="button"
       accessibilityLabel={`${name}، ${count} صنف`}
     >
