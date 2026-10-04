@@ -3,6 +3,9 @@ import { Platform, useWindowDimensions } from "react-native";
 /** عرض المحتوى على سطح المكتب — موقع ويب وليس شاشة هاتف فقط */
 export const WEB_MAX_CONTENT_WIDTH = 1120;
 
+/** تحت هذا العرض: هيدر ويب مضغوط (منيو + سلة) */
+export const WEB_COMPACT_MAX_WIDTH = 720;
+
 export const GRID_HORIZONTAL_PADDING = 40;
 export const GRID_GAP = 12;
 
@@ -39,6 +42,11 @@ export function useProductGridMetrics() {
 }
 
 export function useIsWideWeb() {
-  const contentWidth = useContentWidth();
-  return Platform.OS === "web" && contentWidth >= 720;
+  const { width } = useWindowDimensions();
+  return Platform.OS === "web" && width >= WEB_COMPACT_MAX_WIDTH;
+}
+
+export function useIsCompactWeb() {
+  const { width } = useWindowDimensions();
+  return Platform.OS === "web" && width < WEB_COMPACT_MAX_WIDTH;
 }
