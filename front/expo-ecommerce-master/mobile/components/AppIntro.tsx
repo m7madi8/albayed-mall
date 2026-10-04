@@ -1,7 +1,7 @@
 import MallLogoLoader from "@/components/mall-logo-loader";
 import { palette } from "@/theme/palette";
 import { useCallback } from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { Platform, StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 const EXIT_DURATION_MS = 220;
@@ -32,6 +32,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 1000,
     elevation: 1000,
-    pointerEvents: "none",
+    pointerEvents: "auto",
+    ...(Platform.OS === "web"
+      ? { position: "fixed" as const, top: 0, left: 0, right: 0, bottom: 0 }
+      : {}),
   },
 });

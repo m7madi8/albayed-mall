@@ -87,7 +87,7 @@ function RootLayout() {
   const [loaded, error] = useFonts({
     Cairo: require("../assets/fonts/Cairo-Variable.ttf"),
   });
-  const [showIntro, setShowIntro] = useState(Platform.OS !== "web");
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
     if (loaded || error) {
